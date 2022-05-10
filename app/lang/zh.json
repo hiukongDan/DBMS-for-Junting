@@ -1,0 +1,12 @@
+{
+	"stockin": "進貨",
+	"soldout": "出售",
+	"items": "貨物種類",
+	"stocks": "庫存",
+	"okay": "好",
+	"item": "貨物", 
+	"count": "數量", 
+	"date": "日期", 
+	"name": "姓名",
+	"contact": "電話"
+}
