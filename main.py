@@ -51,9 +51,12 @@ def insertEntry(dataType, newEntry):
     # Primary key, unique
     if dataType == "items":
         if newEntry in Database.data[dataType]:
-            return    
+            return
+        else:
+            Database.data["stocks"].append({**newEntry, "count": 0})
     Database.data[dataType].append(newEntry)
     print("add new entry {} to {}".format(newEntry, dataType))
+    calculateStocks()
 
 
 @eel.expose
@@ -64,7 +67,8 @@ def deleteEntry(dataType, index):
             deleteEntries(type, {"item": Database.data[dataType][index]["item"]})
     print("delete {} from {}".format(Database.data[dataType][index], dataType))
     del Database.data[dataType][index]
-
+    calculateStocks()
+        
         
 def deleteEntries(dataType, entry):
     for i in Database.data[dataType]:
@@ -77,17 +81,38 @@ def deleteEntries(dataType, entry):
             print("delete {} from {}".format(i, dataType))
             Database.data[dataType].remove(i)
 
-    
+
+
+def calculateStocks():
+    itemmap = {}
+    i = 0
+    for data in Database.data["stocks"]:
+        data["count"] = 0
+        itemmap[data["item"]] = i
+        i += 1
+        
+    for data in Database.data["stockin"]:
+        i = itemmap[data["item"]]
+        Database.data["stocks"][i]["count"] += int(data["count"])
+        
+    for data in Database.data["soldout"]:
+        i = itemmap[data["item"]];
+        Database.data["stocks"][i]["count"] -= int(data["count"])
+        
+        
+        
 @eel.expose
 def saveAll():
+    calculateStocks()
     Database.save()
     print("saved to file {}".format(Database.datapath))
 
 
 Database = RuntimeDatabase()
+calculateStocks()
 if __name__ == "__main__":
     try:
-        eel.start("index-en.html")
+        eel.start("index-cn.html")
     except Exception as e:
         print(e)
     finally:

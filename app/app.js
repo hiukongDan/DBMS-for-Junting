@@ -19,6 +19,12 @@ const tableheader = {
 	"soldout": ["item", "count", "date", "name", "contact"]
 };
 
+const inputtypes = {
+	"items": {"item": "text"},
+	"stockin": {"item": "select", "count": "number", "date": "date"},
+	"soldout": {"item": "select", "count": "number", "date": "date", "name": "text", "contact": "tel"}
+};
+
 const btns = {};
 dataTypes.forEach((element, index) => {
 	btns[element] = document.querySelector(".navigation #"+element);
@@ -83,9 +89,88 @@ async function tabShow(tabName){
 			td.setAttribute("class", "table-header");
 		});
 		
-		// table entries
 		var tbody = document.createElement("tbody");
 		tab.appendChild(tbody);
+		
+		// input field
+		if(tabName != "stocks"){
+			const inputs = [];
+			var itemSelect = null;
+			
+			header = document.createElement("tr");
+			tbody.appendChild(header);
+			tableheader[tabName].forEach((element, index) =>{
+				if(element === "item" && inputtypes[tabName]["item"] === "select"){
+					itemSelect = buildSelections(header);
+				}
+				else{
+					var td = document.createElement("td");
+					header.appendChild(td);
+					td.setAttribute("class", "input");
+					var input = document.createElement("input");
+					input.setAttribute("type", inputtypes[tabName][element]);
+					input.setAttribute("id", element);
+					td.appendChild(input);
+					
+					inputs.push(input);
+				}
+
+			});
+			// submit button
+			var td = document.createElement("td");
+			header.appendChild(td);
+			td.setAttribute("class", "input");
+			const submit = document.createElement("input");
+			submit.setAttribute("type", "submit");
+			submit.setAttribute("value", langdata["add"]);
+			submit.setAttribute("id", "submit");
+			td.appendChild(submit);
+			
+			submit.addEventListener("click",  (event) =>{
+				var senddata = {};
+				if(itemSelect){
+					senddata["item"] = itemSelect.options[itemSelect.selectedIndex].value;
+				}
+				
+				inputs.forEach((input) => {
+					if(input.value == ""){
+						alert(langdata["inputinvalid"]);
+					}
+					senddata[input.getAttribute("id")] = 
+						input.getAttribute("id") == "count" ? parseInt(input.value) : input.value;
+				});
+				
+				eel.insertEntry(tabName, senddata)(function(){
+					tabShow(tabName);
+				});
+				
+			});
+			
+			
+			// additional buttons
+			if(tabName == "items"){
+				var tr = document.createElement("tr");
+				tbody.appendChild(tr);
+				var select = buildSelections(tr);
+				var td = document.createElement("td");
+				tr.appendChild(td);
+				td.setAttribute("class", "input");
+				var sub = document.createElement("input");
+				sub.setAttribute("type", "submit");
+				sub.setAttribute("value", langdata["delete"]);
+				sub.setAttribute("id", "submit-item-delete");
+				td.appendChild(sub);
+				
+				sub.addEventListener("click", (event) => {
+					eel.deleteEntry(tabName, select.selectedIndex)(function(){
+						tabShow(tabName);
+					});
+				});
+			}
+		}
+
+		
+		// table entries
 		data.forEach((entry, index) => {
 			var tr = document.createElement("tr");
 			tbody.appendChild(tr);
@@ -95,7 +180,29 @@ async function tabShow(tabName){
 				td.textContent = entry[element];
 			});
 		});
+		
+
 	});
+}
+
+function buildSelections(tr){
+	var td = document.createElement("td");
+	td.setAttribute("class", "input");
+	tr.appendChild(td);
+	
+	var sel = document.createElement("select");
+	sel.setAttribute("id", "item");
+	td.appendChild(sel);
+	
+	eel.getData("items")(function(data){
+		data.forEach((element, index) =>{
+			var op = document.createElement("option");
+			op.setAttribute("value", element["item"]);
+			op.textContent = element["item"];
+			sel.appendChild(op);
+		});
+	});
+	return sel;
 }
 
 

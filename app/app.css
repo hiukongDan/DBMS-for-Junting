@@ -7,9 +7,43 @@ p{
 	font: 1.2em;
 }
 
-a{
-	color: #abb845;
+/* a{ */
+	/* color: #abb845; */
+/* } */
+
+.input{
+	border: 0px;
+	min-width: 160px;
+	min-height: 50px;
+	background-color: #60809a;
+	font-size: 25px;
+	text-align: center;
 }
+
+form{
+	min-height: 50px;
+}
+
+select,
+input{
+	min-width: 100%;
+	min-height: 50px;
+	font-size: 20px;
+}
+
+input[type="submit"]{
+	background-color: #a8671b;
+	margin-left: 20px;
+}
+
+input[type="submit"]:hover{
+	background-color: #bb711a;
+}
+
+input[type="submit"]:active{
+	background-color: #a8671b;
+}
+
 
 .banner{
 	display: flex;
@@ -22,7 +56,7 @@ a{
 
 body{
 	margin: 0px auto;
-	max-width: 960px;
+	min-width: 960px;
 }
 
 .tab{
@@ -49,6 +83,7 @@ td{
 	background-color: #2a353b;
 	font-size: 25px;
 	text-align: center;
+	color: white;
 }
 
 .table-header{

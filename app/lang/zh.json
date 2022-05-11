@@ -8,5 +8,8 @@
 	"count": "數量", 
 	"date": "日期", 
 	"name": "姓名",
-	"contact": "電話"
+	"contact": "電話",
+	"add": "添加",
+	"delete": "刪除",
+	"inputinvalid": "輸入不正確!"
 }
