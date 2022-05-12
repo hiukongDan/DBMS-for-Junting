@@ -1,4 +1,4 @@
-import eel, json, os, datetime, winreg, openpyxl
+import eel, json, os, datetime, winreg, openpyxl, bcrypt, string
 
 
 dataTypes = [
@@ -17,8 +17,8 @@ sheetheader = {
 
 
 class RuntimeDatabase:
-    def __init__(self):
-        self.datapath = "./app/data/data.json"
+    def __init__(self, user):
+        self.datapath = "./app/data/data_"+user+".json"
         self.recoverdatapath = "./app/data/.data.json_recover"
         
         # load data
@@ -27,8 +27,8 @@ class RuntimeDatabase:
                 self.data = json.load(f);
         else:
             with open(self.datapath, 'w', encoding="utf8") as f:
-                pass
-            self.data = {"items":[], "stocks":[], "stockin":[], "soldout":[]}
+                self.data = {"items":[], "stocks":[], "stockin":[], "soldout":[]}
+                json.dump(self.data, f)
         
         # save a recover data for this session
         self.savetofile(self.recoverdatapath)
@@ -52,6 +52,60 @@ class LangData:
         self.lang = lang
         with open("./app/lang/"+lang+".json", "r", encoding="utf8") as f:
             self.data = json.load(f)
+  
+
+class LoginManager:
+    def __init__(self):
+        self.datapath = "./app/user/user.json"
+        if not os.path.exists(self.datapath): 
+            with open(self.datapath, "w") as f:
+                f.write("{}");
+        
+        with open(self.datapath, "r") as f:
+            self.data = json.load(f)
+    
+    
+    def addUser(self, name, password):
+        for usr, pwd in self.data.items():
+            if usr == name:
+                return False
+        for c in password:
+            if (c not in string.digits) and (c not in string.ascii_letters) and\
+                (c not in string.punctuation):
+                return False
+                
+        pwd = bytes(password, encoding="utf8")
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(pwd, salt)
+        print("added user {}".format(name))
+        self.data[name] = str(hashed, encoding="utf8")
+        self.savetofile()
+        return True
+    
+    
+    def verifyUser(self, name, password):
+        password = bytes(password, encoding="utf8")
+        for user, pwd in self.data.items():
+            if name == user and bcrypt.checkpw(password, bytes(pwd, encoding="utf8")):
+                return True
+        return False
+        
+        
+    def changePwd(self, name, newpwd):
+        newpwd = bytes(newpwd, encoding="utf8")
+        for user, pwd in self.data.items():
+            if name == user:
+                salt = bcrypt.gensalt()
+                hashed = bcrypt.hashpw(newpwd, salt)
+                self.data[user] = str(hashed, encoding="utf8")
+                self.savetofile()
+                return True
+        return False
+        
+        
+    def savetofile(self):
+        with open(self.datapath, "w") as f:
+            json.dump(self.data, f);
         
         
         
@@ -90,6 +144,28 @@ def deleteEntry(dataType, index):
 def changeLang(lang):
     langdata.changelang(lang)
     print("Language changed to "+lang)
+    
+@eel.expose
+def addUser(user, pwd):
+    return loginManager.addUser(user, pwd)
+      
+      
+@eel.expose
+def verifyUser(user, pwd):
+    success = loginManager.verifyUser(user, pwd)
+    if (success):
+        global Database
+        Database = RuntimeDatabase(user)
+        calculateStocks()
+        print("user {} log in successfully".format(user))
+    return success
+    
+    
+@eel.expose
+def changePwd(user, pwd):
+    return loginManager.changePwd(user, pwd)
+    
+
       
         
 def deleteEntries(dataType, entry):
@@ -168,15 +244,18 @@ def saveAll():
     calculateStocks()
     Database.save()
     print("saved to file {}".format(Database.datapath))
+    
+    
 
 
-Database = RuntimeDatabase()
+
+Database = None
 langdata = LangData("en")
-calculateStocks()
+loginManager = LoginManager()
 if __name__ == "__main__":
     try:
-        eel.start("index-cn.html")
+        eel.start("login-zh.html")
     except Exception as e:
         print(e)
     finally:
-        Database.save()
+        if Database: Database.save()

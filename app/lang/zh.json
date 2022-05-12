@@ -14,5 +14,12 @@
 	"inputinvalid": "輸入不正確!",
 	"saveall": "保存更改",
 	"savetoexcel": "另存為excel",
-	"done": "完成!"
+	"done": "完成!",
+	"login": "登入",
+	"logout": "登出",
+	"changepwd": "更改密碼",
+	"signup": "註冊帳號",
+	"loginnotvalid": "用戶名或者密碼不正確!",
+	"pwdnosame": "密碼不一致",
+	"success": "成功!"
 }

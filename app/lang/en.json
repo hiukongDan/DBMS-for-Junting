@@ -14,5 +14,12 @@
 	"inputinvalid": "Input is invalid!",
 	"saveall": "Save All",
 	"savetoexcel": "Save to excel",
-	"done": "Done!"
+	"done": "Done!",
+	"login": "Log in",
+	"logout": "Log out",
+	"changepwd": "Change Password",
+	"signup": "Sign up",
+	"loginnotvalid": "Username not found or password incorrect!",
+	"pwdnosame": "Passwords are not the same!",
+	"success": "Success!"
 }

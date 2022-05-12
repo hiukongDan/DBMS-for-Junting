@@ -110,3 +110,25 @@ td{
 	bottom: 0px;
 	margin: 3px;
 }
+
+.panel{
+	margin-top: 10vh;
+	margin-left: 25vw;
+	margin-right: 25vw;
+	padding: 20px;
+	border: black solid 5px;
+}
+
+.pannel input{
+	margin-left: 100px;
+	min-width: 256px;
+}
+
+.panel input[type="submit"]{
+	min-width: 10vw;
+}
+
+.panel label{
+	margin-right: 100px;
+	font-size: 1.5em;
+}

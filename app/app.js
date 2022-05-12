@@ -94,6 +94,13 @@ async function tabShow(tabName){
 				alert(langdata["done"]);
 			});
 		});
+		buildButton(tr, langdata["logout"]).addEventListener("click", function(){
+			eel.saveAll()(function(){
+				var lang = document.getElementsByTagName("html")[0].getAttribute("lang");
+				location.replace("login-"+lang+".html");
+			});
+		});
+		
 		
 		
 		
