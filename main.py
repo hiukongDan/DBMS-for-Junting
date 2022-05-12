@@ -247,8 +247,6 @@ def saveAll():
     
     
 
-
-
 Database = None
 langdata = LangData("en")
 loginManager = LoginManager()

@@ -25,6 +25,15 @@ const inputtypes = {
 	"soldout": {"item": "select", "count": "number", "date": "date", "name": "text", "contact": "tel"}
 };
 
+const requires = ["count"];
+const defaultvalues = {
+	"item": "goods",
+	"count": 0,
+	"date": `${new Date().getFullYear()}-${("0"+(1+new Date().getMonth())).slice(-2)}-${("0"+new Date().getDate()).slice(-2)}`,
+	"name": "",
+	"contact": ""}
+;
+
 const btns = {};
 dataTypes.forEach((element, index) => {
 	btns[element] = document.querySelector(".navigation #"+element);
@@ -138,6 +147,12 @@ async function tabShow(tabName){
 					td.appendChild(input);
 					
 					inputs.push(input);
+					
+					if(requires.includes(element)){
+						input.setAttribute("required", "required");
+					}
+					input.value = defaultvalues[element];
+					console.log(defaultvalues[element]);
 				}
 			});
 			
