@@ -152,7 +152,6 @@ async function tabShow(tabName){
 						input.setAttribute("required", "required");
 					}
 					input.value = defaultvalues[element];
-					console.log(defaultvalues[element]);
 				}
 			});
 			

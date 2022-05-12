@@ -5,4 +5,4 @@ pip install openpyxl
 pip install bcrypt
 echo Install required modules successfully!
 echo python main.py > junting.cmd
-echo python main.py > %USERPROFILE%\Desktop\junting.cmd
+powershell -File shortcut.ps1

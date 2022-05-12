@@ -233,6 +233,7 @@ def saveToExcel():
         now = datetime.datetime.now()
         timestamp = "{}_{}_{}_{}.{}.{}".format(now.year,now.month,now.day,now.hour,now.minute,now.second)
         path = os.path.join(desktoppath, "junting_"+timestamp+".xlsx")
+        path = os.path.abspath(path)
         workbook = jsonToXlsx()
         workbook.save(filename=path)
     except Exception as e:
