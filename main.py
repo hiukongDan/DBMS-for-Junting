@@ -123,8 +123,8 @@ def insertEntry(dataType, newEntry):
         if newEntry in Database.data[dataType]:
             return
         else:
-            Database.data["stocks"].append({**newEntry, "count": 0})
-    Database.data[dataType].append(newEntry)
+            Database.data["stocks"].insert(0, {**newEntry, "count": 0})
+    Database.data[dataType].insert(0, newEntry)
     print("add new entry {} to {}".format(newEntry, dataType))
     calculateStocks()
 

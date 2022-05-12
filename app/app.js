@@ -180,7 +180,7 @@ async function tabShow(tabName){
 				}
 				
 				inputs.forEach((input) => {
-					if(input.value == ""){
+					if(input.getAttribute("required") === "required" && input.value == ""){
 						isValid = false;
 					}
 					senddata[input.getAttribute("id")] = 
@@ -189,6 +189,7 @@ async function tabShow(tabName){
 				
 				if(!isValid){
 					alert(langdata["inputinvalid"]);
+					return;
 				}
 				else{
 					eel.insertEntry(tabName, senddata)(function(){
