@@ -230,10 +230,12 @@ def saveToExcel():
             "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders");
         desktoppath = winreg.QueryValueEx(folder, "Desktop")[0]
         
+        print(desktoppath)
+        
         now = datetime.datetime.now()
         timestamp = "{}_{}_{}_{}.{}.{}".format(now.year,now.month,now.day,now.hour,now.minute,now.second)
         path = os.path.join(desktoppath, "junting_"+timestamp+".xlsx")
-        path = os.path.abspath(path)
+        path = os.path.expandvars(path)
         workbook = jsonToXlsx()
         workbook.save(filename=path)
     except Exception as e:
