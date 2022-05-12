@@ -51,6 +51,8 @@ async function loadLangData(){
 	dataTypes.forEach((element, index) =>{
 		btns[element].textContent = langdata[element];
 	});
+	
+	eel.changeLang(lang);
 }
 
 
@@ -78,6 +80,22 @@ async function tabShow(tabName){
 	eel.getData(tabName)(function(data){
 		// console.log(data)
 		var tab = tabs[tabName].getElementsByTagName("table")[0];
+		
+		// functional buttons
+		var tr = document.createElement("tr");
+		tab.appendChild(tr);
+		buildButton(tr, langdata["saveall"]).addEventListener("click", function(){
+			eel.saveAll()(function(){
+				alert(langdata["done"]);
+			});
+		});
+		buildButton(tr, langdata["savetoexcel"]).addEventListener("click", function(){
+			eel.saveToExcel()(function(){
+				alert(langdata["done"]);
+			});
+		});
+		
+		
 		
 		// table header
 		var header = document.createElement("tr");
@@ -114,8 +132,9 @@ async function tabShow(tabName){
 					
 					inputs.push(input);
 				}
-
 			});
+			
+			
 			// submit button
 			var td = document.createElement("td");
 			header.appendChild(td);
@@ -128,45 +147,34 @@ async function tabShow(tabName){
 			
 			submit.addEventListener("click",  (event) =>{
 				var senddata = {};
+				var isValid = true;
 				if(itemSelect){
-					senddata["item"] = itemSelect.options[itemSelect.selectedIndex].value;
+					if(itemSelect.options.length > 0){
+						senddata["item"] = itemSelect.options[itemSelect.selectedIndex].value;
+					}
+					else{
+						isValid = false;
+					}
 				}
 				
 				inputs.forEach((input) => {
 					if(input.value == ""){
-						alert(langdata["inputinvalid"]);
+						isValid = false;
 					}
 					senddata[input.getAttribute("id")] = 
 						input.getAttribute("id") == "count" ? parseInt(input.value) : input.value;
 				});
 				
-				eel.insertEntry(tabName, senddata)(function(){
-					tabShow(tabName);
-				});
+				if(!isValid){
+					alert(langdata["inputinvalid"]);
+				}
+				else{
+					eel.insertEntry(tabName, senddata)(function(){
+						tabShow(tabName);
+					});					
+				}
 				
 			});
-			
-			
-			// additional buttons
-			if(tabName == "items"){
-				var tr = document.createElement("tr");
-				tbody.appendChild(tr);
-				var select = buildSelections(tr);
-				var td = document.createElement("td");
-				tr.appendChild(td);
-				td.setAttribute("class", "input");
-				var sub = document.createElement("input");
-				sub.setAttribute("type", "submit");
-				sub.setAttribute("value", langdata["delete"]);
-				sub.setAttribute("id", "submit-item-delete");
-				td.appendChild(sub);
-				
-				sub.addEventListener("click", (event) => {
-					eel.deleteEntry(tabName, select.selectedIndex)(function(){
-						tabShow(tabName);
-					});
-				});
-			}
 		}
 
 		
@@ -179,10 +187,41 @@ async function tabShow(tabName){
 				tr.appendChild(td);
 				td.textContent = entry[element];
 			});
+			
+			if(tabName != "stocks"){
+				// Add a delete button for each entry
+				var btn = document.createElement("input");
+				var td = document.createElement("td");
+				tr.appendChild(td);
+				td.appendChild(btn);
+				td.setAttribute("class", "input");
+				btn.setAttribute("type", "submit");
+				btn.setAttribute("value", langdata["delete"]);
+				
+				btn.addEventListener("click", function(){
+					eel.deleteEntry(tabName, index)(function(){
+						tabShow(tabName);
+					});
+				});
+			}
 		});
 		
 
 	});
+}
+
+
+function buildButton(tr, value){
+	var td = document.createElement("td");
+	tr.appendChild(td);
+	td.setAttribute("class", "input");
+	
+	var btn = document.createElement("input");
+	btn.setAttribute("type", "submit");
+	btn.setAttribute("value", value);
+	td.appendChild(btn);
+	
+	return btn;
 }
 
 function buildSelections(tr){

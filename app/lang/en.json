@@ -11,5 +11,8 @@
 	"contact": "contact",
 	"add": "Add",
 	"delete": "Delete",
-	"inputinvalid": "Input is invalid!"
+	"inputinvalid": "Input is invalid!",
+	"saveall": "Save All",
+	"savetoexcel": "Save to excel",
+	"done": "Done!"
 }

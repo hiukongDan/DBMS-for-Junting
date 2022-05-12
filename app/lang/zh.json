@@ -11,5 +11,8 @@
 	"contact": "電話",
 	"add": "添加",
 	"delete": "刪除",
-	"inputinvalid": "輸入不正確!"
+	"inputinvalid": "輸入不正確!",
+	"saveall": "保存更改",
+	"savetoexcel": "另存為excel",
+	"done": "完成!"
 }

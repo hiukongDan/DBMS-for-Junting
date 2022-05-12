@@ -1,4 +1,4 @@
-import eel, json, os, datetime
+import eel, json, os, datetime, winreg, openpyxl
 
 
 dataTypes = [
@@ -8,6 +8,13 @@ dataTypes = [
    "stocks"
 ]
 
+sheetheader = {
+	"items": ["item",],
+	"stocks": ["item", "count"],
+	"stockin": ["item", "count", "date"],
+	"soldout": ["item", "count", "date", "name", "contact"]
+};
+
 
 class RuntimeDatabase:
     def __init__(self):
@@ -16,10 +23,10 @@ class RuntimeDatabase:
         
         # load data
         if(os.path.exists(self.datapath)):
-            with open(self.datapath) as f:
+            with open(self.datapath, "r", encoding="utf8") as f:
                 self.data = json.load(f);
         else:
-            with open(self.datapath, 'w') as f:
+            with open(self.datapath, 'w', encoding="utf8") as f:
                 pass
             self.data = {"items":[], "stocks":[], "stockin":[], "soldout":[]}
         
@@ -36,6 +43,15 @@ class RuntimeDatabase:
         self.savetofile(self.datapath)
         
 
+class LangData:
+    def __init__(self, lang):
+        self.changelang(lang)
+            
+            
+    def changelang(self, lang):
+        self.lang = lang
+        with open("./app/lang/"+lang+".json", "r", encoding="utf8") as f:
+            self.data = json.load(f)
         
         
         
@@ -68,7 +84,13 @@ def deleteEntry(dataType, index):
     print("delete {} from {}".format(Database.data[dataType][index], dataType))
     del Database.data[dataType][index]
     calculateStocks()
-        
+      
+
+@eel.expose
+def changeLang(lang):
+    langdata.changelang(lang)
+    print("Language changed to "+lang)
+      
         
 def deleteEntries(dataType, entry):
     for i in Database.data[dataType]:
@@ -98,8 +120,48 @@ def calculateStocks():
     for data in Database.data["soldout"]:
         i = itemmap[data["item"]];
         Database.data["stocks"][i]["count"] -= int(data["count"])
+ 
+
+def jsonToXlsx():
+    wb = openpyxl.Workbook()
+    sheetsTitle = dataTypes
+    sheets = {}
+    sheets[sheetsTitle[0]] = wb.active
+    sheets[sheetsTitle[0]].title = sheetsTitle[0]
+    for i in range(1, len(sheetsTitle)):
+        sheet = wb.create_sheet(title=langdata.data[sheetsTitle[i]])
+        sheets[sheetsTitle[i]] = sheet
+    for k, v in sheets.items():
+        i = 1
+        for title in sheetheader[k]:
+            v.cell(column=i, row=1, value=langdata.data[title])
+            i += 1
+            
+        i = 2
+        for data in Database.data[k]:
+            for j in range(0, len(data)):
+                v.cell(column=j+1, row=i, value=str(data[sheetheader[k][j]]))
+            i += 1
+    
+    return wb
+    
+    
+    
+@eel.expose
+def saveToExcel():
+    try:
+        folder = winreg.OpenKeyEx(winreg.HKEY_CURRENT_USER, 
+            "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders");
+        desktoppath = winreg.QueryValueEx(folder, "Desktop")[0]
         
-        
+        now = datetime.datetime.now()
+        timestamp = "{}_{}_{}_{}.{}.{}".format(now.year,now.month,now.day,now.hour,now.minute,now.second)
+        path = os.path.join(desktoppath, "junting_"+timestamp+".xlsx")
+        workbook = jsonToXlsx()
+        workbook.save(filename=path)
+    except Exception as e:
+        raise e
+    
         
 @eel.expose
 def saveAll():
@@ -109,6 +171,7 @@ def saveAll():
 
 
 Database = RuntimeDatabase()
+langdata = LangData("en")
 calculateStocks()
 if __name__ == "__main__":
     try:
